@@ -1,0 +1,60 @@
+
+#  PYTHON / DJANGO
+
+venv/
+env/
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Database
+*.sqlite3
+db.sqlite3
+*.sqlite3-journal
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Django
+media/
+staticfiles/
+*.log
+
+
+#  NODE / NEXT.JS
+
+node_modules/
+.next/
+out/
+build/
+dist/
+*.tsbuildinfo
+next-env.d.ts
+
+# npm/yarn
+npm-debug.log*
+yarn-error.log*
+
+
+#  IDE / OS
+
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+
+#  LOGS
+
+*.log
+logs/
