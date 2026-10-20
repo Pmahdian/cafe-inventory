@@ -11,7 +11,7 @@ class Ingredient(models.Model):
     ]
     name = models.CharField(max_length=100, unique=True)
     unit = models.CharField(max_length=10, choices=UNIT_CHOICES)
-    initial_stock = models.DecimalField(          # ← این جدید
+    initial_stock = models.DecimalField(       
         max_digits=10, decimal_places=2, default=0,
         validators=[MinValueValidator(0)],
         help_text="Stock before any transaction (the starting point)"

@@ -1,0 +1,14 @@
+venv/
+env/
+__pycache__/
+*.py[cod]
+*.sqlite3
+db.sqlite3
+.env
+node_modules/
+.next/
+.git/
+.gitignore
+.DS_Store
+README.md
+LICENSE
