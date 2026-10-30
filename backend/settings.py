@@ -4,6 +4,7 @@ Django settings for backend project.
 import os
 from pathlib import Path
 from dotenv import load_dotenv
+import dj_database_url
 
 # ─── Load .env ─────────────────────────────
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -18,6 +19,7 @@ SECRET_KEY = os.environ.get(
 
 DEBUG = os.environ.get('DJANGO_DEBUG', 'True').lower() == 'true'
 
+# Allow hosts. On Render, RENDER_EXTERNAL_HOSTNAME is set automatically.
 ALLOWED_HOSTS = [
     h.strip()
     for h in os.environ.get(
@@ -26,6 +28,10 @@ ALLOWED_HOSTS = [
     ).split(',')
     if h.strip()
 ]
+
+RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
+if RENDER_EXTERNAL_HOSTNAME:
+    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
 
 
 # ─── Applications ──────────────────────────
@@ -48,6 +54,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -78,7 +85,21 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 
 
 # ─── Database ──────────────────────────────
-if os.environ.get('POSTGRES_HOST'):
+# 1) Priority: DATABASE_URL (Render, Heroku, etc.)
+# 2) Fallback: Postgres env vars (Docker local)
+# 3) Fallback: SQLite (bare-metal local dev)
+
+DATABASE_URL = os.environ.get('DATABASE_URL')
+
+if DATABASE_URL:
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=DATABASE_URL,
+            conn_max_age=600,
+            conn_health_checks=True,
+        )
+    }
+elif os.environ.get('POSTGRES_HOST'):
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
@@ -121,6 +142,9 @@ USE_TZ = True
 STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
+# WhiteNoise: serve compressed, hashed static files in production
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
@@ -135,6 +159,23 @@ CORS_ALLOWED_ORIGINS = [
 ]
 
 CORS_ALLOW_CREDENTIALS = True
+
+
+# ─── CSRF (needed for Render / HTTPS) ─────
+CSRF_TRUSTED_ORIGINS = [
+    o.strip()
+    for o in os.environ.get(
+        'CSRF_TRUSTED_ORIGINS',
+        'http://localhost:3000,http://127.0.0.1:3000'
+    ).split(',')
+    if o.strip()
+]
+
+if RENDER_EXTERNAL_HOSTNAME:
+    CSRF_TRUSTED_ORIGINS.append(f'https://{RENDER_EXTERNAL_HOSTNAME}')
+
+# Render terminates HTTPS at its proxy; Django needs to know the request was secure
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 
 # ─── Django REST Framework ─────────────────
