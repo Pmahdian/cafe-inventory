@@ -1,11 +1,15 @@
 from rest_framework import serializers
-from .models import Ingredient, Product, RecipeItem, StockEntry, Sale
-from decimal import Decimal
-
+from .models import Category, Ingredient, Product, RecipeItem, StockEntry, Sale
 
 # ═══════════════════════════════════════════════
-#  READ SERIALIZERS (for displaying data)
+#  READ SERIALIZERS
 # ═══════════════════════════════════════════════
+
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = ('id', 'name', 'order')
+
 
 class IngredientSerializer(serializers.ModelSerializer):
     class Meta:
@@ -16,9 +20,7 @@ class IngredientSerializer(serializers.ModelSerializer):
 
 
 class RecipeItemSerializer(serializers.ModelSerializer):
-    ingredient_name = serializers.CharField(
-        source='ingredient.name', read_only=True
-    )
+    ingredient_name = serializers.CharField(source='ingredient.name', read_only=True)
     unit = serializers.CharField(source='ingredient.unit', read_only=True)
 
     class Meta:
@@ -28,16 +30,15 @@ class RecipeItemSerializer(serializers.ModelSerializer):
 
 class ProductSerializer(serializers.ModelSerializer):
     recipe_items = RecipeItemSerializer(many=True, read_only=True)
+    category_name = serializers.CharField(source='category.name', read_only=True)
 
     class Meta:
         model = Product
-        fields = ('id', 'name', 'price', 'is_active', 'recipe_items')
+        fields = ('id', 'name', 'category', 'category_name', 'price', 'is_active', 'recipe_items')
 
 
 class StockEntrySerializer(serializers.ModelSerializer):
-    ingredient_name = serializers.CharField(
-        source='ingredient.name', read_only=True
-    )
+    ingredient_name = serializers.CharField(source='ingredient.name', read_only=True)
 
     class Meta:
         model = StockEntry
@@ -47,9 +48,7 @@ class StockEntrySerializer(serializers.ModelSerializer):
 
 
 class SaleSerializer(serializers.ModelSerializer):
-    product_name = serializers.CharField(
-        source='product.name', read_only=True
-    )
+    product_name = serializers.CharField(source='product.name', read_only=True)
     total_price = serializers.SerializerMethodField()
 
     class Meta:
@@ -63,7 +62,7 @@ class SaleSerializer(serializers.ModelSerializer):
 
 
 # ═══════════════════════════════════════════════
-#  WRITE SERIALIZERS (for creating data)
+#  WRITE SERIALIZERS
 # ═══════════════════════════════════════════════
 
 class SaleCreateSerializer(serializers.Serializer):
@@ -77,8 +76,7 @@ class StockEntryCreateSerializer(serializers.Serializer):
     """Simple input for stock entry — logic lives in services.py"""
     ingredient_id = serializers.IntegerField()
     amount = serializers.DecimalField(
-    max_digits=10, decimal_places=2, min_value=Decimal('0.01')  # ← Decimal
-        )
-    
+        max_digits=10, decimal_places=2, min_value=0.01
+    )
     date = serializers.DateField(required=False)
     note = serializers.CharField(required=False, allow_blank=True, default='')

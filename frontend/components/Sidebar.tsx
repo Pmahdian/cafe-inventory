@@ -3,120 +3,74 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
-  Coffee,
-  LayoutDashboard,
-  ShoppingCart,
-  PackagePlus,
-  BarChart3,
-  Boxes,
-  CupSoda,
+  Coffee, LayoutDashboard, ShoppingCart,
+  PackagePlus, BarChart3, Boxes, CupSoda, Receipt
 } from 'lucide-react';
+import { useLanguage } from './LanguageProvider';
+
+export default function Sidebar() {
+  const pathname = usePathname();
+  const { t } = useLanguage();
 
 const sections = [
   {
-    title: 'Overview',
+    title: t('overview'),
+    items: [{ href: '/', label: t('dashboard'), icon: LayoutDashboard }],
+  },
+  {
+    title: t('operations'),
     items: [
-      { href: '/', label: 'Dashboard', icon: LayoutDashboard },
+      { href: '/sales', label: t('sales'), icon: ShoppingCart },
+      { href: '/invoices', label: t('invoices'), icon: Receipt },
+      { href: '/stock', label: t('stock_in'), icon: PackagePlus },
     ],
   },
   {
-    title: 'Operations',
-    items: [
-      { href: '/sales', label: 'Sales', icon: ShoppingCart },
-      { href: '/stock', label: 'Stock In', icon: PackagePlus },
-    ],
+    title: t('analytics'),
+    items: [{ href: '/report', label: t('daily_report'), icon: BarChart3 }],
   },
   {
-    title: 'Analytics',
+    title: t('catalog'),
     items: [
-      { href: '/report', label: 'Daily Report', icon: BarChart3 },
-    ],
-  },
-  {
-    title: 'Catalog',
-    items: [
-      { href: '/ingredients', label: 'Ingredients', icon: Boxes },
-      { href: '/products', label: 'Products', icon: CupSoda },
+      { href: '/ingredients', label: t('ingredients'), icon: Boxes },
+      { href: '/products', label: t('products'), icon: CupSoda },
     ],
   },
 ];
 
-export default function Sidebar() {
-  const pathname = usePathname();
-
   return (
-    <aside
-      className="fixed top-0 left-0 h-screen w-60 flex flex-col z-40"
-      style={{
-        background: 'var(--surface)',
-        borderRight: '1px solid var(--border)',
-      }}
-    >
-      {/* Logo */}
-      <div
-        className="h-16 px-5 flex items-center gap-3 shrink-0"
-        style={{ borderBottom: '1px solid var(--border)' }}
-      >
-        <div
-          className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
-          style={{
-            background:
-              'linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%)',
-          }}
-        >
-          <Coffee className="w-4 h-4 text-white" strokeWidth={2.5} />
+    <aside className="fixed top-0 left-0 h-screen w-64 flex flex-col z-40 bg-[var(--surface)] border-r border-[var(--border)] transition-colors duration-300">
+      <div className="h-16 px-6 flex items-center gap-3 border-b border-[var(--border)]">
+        <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center shrink-0 shadow-lg shadow-amber-500/20">
+          <Coffee className="w-5 h-5 text-white" strokeWidth={2.5} />
         </div>
         <div className="flex flex-col leading-none">
-          <span
-            className="text-sm font-bold tracking-tight"
-            style={{ color: 'var(--text)' }}
-          >
-            Cafe Inv.
-          </span>
-          <span
-            className="text-[10px] uppercase tracking-wider mt-0.5"
-            style={{ color: 'var(--text-subtle)' }}
-          >
-            v1.0
-          </span>
+          <span className="text-sm font-bold text-[var(--text)]">Cafe Inv.</span>
+          <span className="text-[10px] uppercase tracking-wider text-[var(--text-muted)] mt-1">v1.0</span>
         </div>
       </div>
 
-      {/* Nav */}
-      <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-6">
-        {sections.map((section) => (
-          <div key={section.title}>
-            <p
-              className="px-3 mb-2 text-[10px] font-semibold uppercase tracking-[0.12em]"
-              style={{ color: 'var(--text-subtle)' }}
-            >
+      <nav className="flex-1 overflow-y-auto px-4 py-6 space-y-8">
+        {sections.map((section, idx) => (
+          <div key={idx}>
+            <p className="px-3 mb-2 text-[10px] font-bold uppercase tracking-[0.15em] text-[var(--text-muted)]">
               {section.title}
             </p>
-            <div className="space-y-0.5">
+            <div className="space-y-1">
               {section.items.map((item) => {
                 const Icon = item.icon;
-                const isActive =
-                  item.href === '/'
-                    ? pathname === '/'
-                    : pathname.startsWith(item.href);
+                const isActive = item.href === '/' ? pathname === '/' : pathname.startsWith(item.href);
                 return (
                   <Link
                     key={item.href}
                     href={item.href}
-                    className="flex items-center gap-3 px-3 py-2 rounded-lg text-[13px] font-medium transition-all duration-150"
-                    style={
+                    className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
                       isActive
-                        ? {
-                            background: 'var(--primary-soft)',
-                            color: 'var(--primary)',
-                          }
-                        : { color: 'var(--text-muted)' }
-                    }
+                        ? 'bg-amber-50 text-amber-600 dark:bg-amber-500/10 dark:text-amber-500 shadow-sm'
+                        : 'text-[var(--text-muted)] hover:bg-[var(--surface-2)] hover:text-[var(--text)]'
+                    }`}
                   >
-                    <Icon
-                      className="w-4 h-4 shrink-0"
-                      strokeWidth={isActive ? 2.5 : 2}
-                    />
+                    <Icon className="w-4 h-4 shrink-0" strokeWidth={isActive ? 2.5 : 2} />
                     <span>{item.label}</span>
                   </Link>
                 );
@@ -126,46 +80,15 @@ export default function Sidebar() {
         ))}
       </nav>
 
-      {/* Footer */}
-      <div
-        className="px-3 py-3 shrink-0"
-        style={{ borderTop: '1px solid var(--border)' }}
-      >
-        <div
-          className="px-3 py-2 rounded-lg text-[11px]"
-          style={{
-            background: 'var(--surface-2)',
-            color: 'var(--text-muted)',
-          }}
-        >
-          <div className="flex items-center gap-2">
-            <div
-              className="w-1.5 h-1.5 rounded-full animate-pulse"
-              style={{ background: 'var(--success)' }}
-            />
-            <span>Backend online</span>
-          </div>
+      <div className="p-4 border-t border-[var(--border)]">
+        <div className="px-4 py-3 rounded-xl bg-[var(--surface-2)] flex items-center gap-3">
+          <span className="relative flex h-2.5 w-2.5">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+          </span>
+          <span className="text-xs font-medium text-[var(--text-muted)]">{t('system_online')}</span>
         </div>
       </div>
     </aside>
   );
 }
-{/* Footer */}
-<div
-  className="px-3 py-3 shrink-0"
-  style={{ borderTop: '1px solid var(--border)' }}
->
-  <div
-    className="px-3 py-2 rounded-lg text-[11px] flex items-center gap-2"
-    style={{
-      background: 'var(--surface-2)',
-      color: 'var(--text-muted)',
-    }}
-  >
-    <div
-      className="w-1.5 h-1.5 rounded-full shrink-0 animate-pulse"
-      style={{ background: 'var(--success)' }}
-    />
-    <span className="truncate">Backend online</span>
-  </div>
-</div>

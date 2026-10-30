@@ -1,12 +1,9 @@
+from django.urls import path
 from rest_framework.routers import DefaultRouter
 from .views import (
-    IngredientViewSet,
-    ProductViewSet,
-    StockEntryViewSet,
-    SaleViewSet,
-    ReportViewSet,
+    IngredientViewSet, ProductViewSet, StockEntryViewSet, 
+    SaleViewSet, ReportViewSet, CategoryViewSet, shift_management
 )
-
 
 class OptionalSlashRouter(DefaultRouter):
     """
@@ -17,12 +14,16 @@ class OptionalSlashRouter(DefaultRouter):
         super().__init__(*args, **kwargs)
         self.trailing_slash = '/?'
 
-
 router = OptionalSlashRouter()
 router.register('ingredients', IngredientViewSet)
 router.register('products', ProductViewSet)
 router.register('stock-entries', StockEntryViewSet, basename='stock-entry')
 router.register('sales', SaleViewSet)
 router.register('reports', ReportViewSet, basename='report')
+router.register('categories', CategoryViewSet)
 
-urlpatterns = router.urls
+# اضافه کردن مسیر صندوق به همراه بقیه مسیرها
+urlpatterns = [
+    path('shift', shift_management),
+    path('shift/', shift_management),
+] + router.urls

@@ -8,6 +8,12 @@ export const api = axios.create({
 // ─── Types ─────────────────────────────────────
 export type Unit = 'ml' | 'gr' | 'count';
 
+export interface Category {
+  id: number;
+  name: string;
+  order: number;
+}
+
 export interface Ingredient {
   id: number;
   name: string;
@@ -28,6 +34,8 @@ export interface RecipeItem {
 export interface Product {
   id: number;
   name: string;
+  category: number | null;
+  category_name: string | null;
   price: string;
   is_active: boolean;
   recipe_items: RecipeItem[];
@@ -71,6 +79,9 @@ export interface DailyReport {
 }
 
 // ─── API functions ─────────────────────────────
+export const getCategories = () =>
+  api.get<Category[]>('/categories/').then(r => r.data);
+
 export const getIngredients = () =>
   api.get<Ingredient[]>('/ingredients/').then(r => r.data);
 

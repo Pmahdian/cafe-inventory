@@ -5,11 +5,9 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: path.join(__dirname),
   },
-  // Accept any local network IP in dev
   allowedDevOrigins: [
     'localhost',
     '127.0.0.1',
-    // LAN ranges
     '10.*.*.*',
     '172.*.*.*',
     '192.168.*.*',
@@ -18,7 +16,7 @@ const nextConfig: NextConfig = {
     return [
       {
         source: '/api/:path*',
-        destination: 'http://backend:8000/api/:path*', 
+        destination: 'http://127.0.0.1:8000/api/:path*', // ← اینجا تغییر کرد
       },
     ];
   },

@@ -1,7 +1,20 @@
 from django.db import models
 from django.core.validators import MinValueValidator
+from django.utils import timezone
 
+class Category(models.Model):
+    """Product categories (e.g. Breakfast, Hot Coffee, Shakes)"""
+    name = models.CharField(max_length=100, unique=True)
+    order = models.PositiveIntegerField(default=0, help_text="Order to display in UI")
 
+    class Meta:
+        verbose_name_plural = "Categories"
+        ordering = ['order', 'name']
+
+    def __str__(self):
+        return self.name
+
+    
 class Ingredient(models.Model):
     """Raw materials: milk, coffee, syrup, etc."""
     UNIT_CHOICES = [
@@ -34,6 +47,7 @@ class Ingredient(models.Model):
 class Product(models.Model):
     """Final products: Latte, Americano, ..."""
     name = models.CharField(max_length=100, unique=True)
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True, related_name='products')
     price = models.DecimalField(max_digits=10, decimal_places=0)
     is_active = models.BooleanField(default=True)
 
@@ -98,3 +112,17 @@ class Sale(models.Model):
 
     def __str__(self):
         return f"{self.quantity}x {self.product} on {self.date}"
+
+
+
+
+class Shift(models.Model):
+    opened_at = models.DateTimeField(auto_now_add=True)
+    closed_at = models.DateTimeField(default=timezone.now)
+    system_total = models.DecimalField(max_digits=12, decimal_places=0, default=0)
+    actual_cash = models.DecimalField(max_digits=12, decimal_places=0, default=0)
+    difference = models.DecimalField(max_digits=12, decimal_places=0, default=0)
+    is_closed = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"Shift {self.opened_at.strftime('%Y-%m-%d')} - {'Closed' if self.is_closed else 'Open'}"
