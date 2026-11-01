@@ -158,7 +158,11 @@ export default function SalesPage() {
     const printWindow = window.open('', '', 'width=450,height=700');
     if (!printWindow) return toast.error('مرورگر اجازه چاپ نمی‌دهد');
     
-    const orderTypeLabels = { dine_in: 'سالن', takeaway: 'بیرون بر', delivery: 'پیک' };
+    const orderTypeLabels: Record<string, string> = { 
+  dine_in: 'سالن', 
+  takeaway: 'بیرون بر', 
+  delivery: 'پیک' 
+};
     const items = lastSaleData.items;
     
     const itemsHTML = type === 'customer'

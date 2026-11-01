@@ -155,7 +155,7 @@ export default function DashboardPage() {
                     ))}
                   </Pie>
                   <RechartsTooltip
-                    formatter={(value: number) => `${value.toLocaleString()} تومان`}
+                    formatter={(value: any) => `${Number(value).toLocaleString()} تومان`}
                     contentStyle={{ borderRadius: '16px', border: '1px solid var(--border)', backgroundColor: 'var(--surface)', color: 'var(--text)', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}
                     itemStyle={{ color: 'var(--text)', fontWeight: 'bold' }}
                   />
